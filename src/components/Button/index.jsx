@@ -8,7 +8,7 @@ export function Button({ title, loading = false, background = "default", ...rest
             $background={background}
             {...rest}
         >
-            {title}
+            { loading ? 'Carregando...' : title }
         </Container>
     );
 }

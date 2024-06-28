@@ -6,6 +6,7 @@ export default createGlobalStyle`
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        text-decoration: none;
     }
 
     :root {
@@ -28,11 +29,7 @@ export default createGlobalStyle`
         font-size: 1rem;
         outline: none;
     }
-
-    * {
-        text-decoration: none;
-    }
-
+    
     button, a {
         cursor: pointer;
         transition: filter 0.2s;

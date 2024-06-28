@@ -9,7 +9,7 @@ export const Container = styled.div`
 
     margin-bottom: .5rem;
     border-radius: .63rem;
-    border: ${({ theme }) => `1px solid ${theme.COLORS.BACKGROUND_900}`};
+    border: ${({ theme }) => `1px solid ${theme.COLORS.GRAY_100}`};
 
     > input {
         width: 100%;
@@ -17,7 +17,7 @@ export const Container = styled.div`
 
         padding: .75rem;
 
-        color: ${({ theme }) => theme.COLORS.WHITE_100};
+        color: ${({ theme }) => theme.COLORS.BACKGROUND_900};
         background: transparent;
         border: 0;
 
