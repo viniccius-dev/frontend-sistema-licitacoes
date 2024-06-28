@@ -15,8 +15,8 @@ export function SignIn() {
                 <h2>Acesse sua conta</h2>
 
                 <Input 
-                    placeholder="Nome"
-                    type="text"
+                    placeholder="E-mail"
+                    type="email"
                     icon={FiMail}
                 />
 
