@@ -14,14 +14,21 @@ export const Container = styled.aside`
     position: absolute;
     z-index: 1;
 
+    transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
+
+    @media (min-width: ${DEVICE_BREAKPOINTS.MD}) {
+        grid-area: menu;
+        position: static;
+        transform: none;
+    }
 `;
 
 export const Header = styled.header`
     display: flex;
     justify-content: space-between;
     padding: 32px 24px;
-    border: ${({ theme }) => `1px solid ${theme.COLORS.BROWN_200}`};
+    border-bottom: ${({ theme }) => `1px solid ${theme.COLORS.BROWN_200}`};
 `;
 
 export const Title = styled.h1 `

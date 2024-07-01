@@ -13,6 +13,11 @@ export const Container = styled.button`
     border-radius: .63rem;
     font-weight: 700;
 
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: center;
+
     &:disabled {
         opacity: 0.8;
     }
