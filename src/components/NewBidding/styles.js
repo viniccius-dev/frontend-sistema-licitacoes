@@ -3,7 +3,9 @@ import { DEVICE_BREAKPOINTS } from "../../styles/deviceBreakpoints";
 
 export const Container = styled.form`
     grid-area: content;
-    padding: 2rem;
+    padding: 20px 32px;
+
+    overflow-y: auto;
 `;
 
 export const W50 = styled.div`
@@ -12,7 +14,7 @@ export const W50 = styled.div`
     margin-bottom: 10px;
     flex-direction: column;
 
-    @media (min-width: ${DEVICE_BREAKPOINTS.MD}) {
+    @media (min-width: ${DEVICE_BREAKPOINTS.LG}) {
         flex-direction: row;
     }
 `;

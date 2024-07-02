@@ -3,6 +3,7 @@ import { Container, W50, InputWrapper } from './styles';
 import { Input } from '../Input';
 import { InputSelect } from '../InputSelect';
 import { Textarea } from '../Textarea';
+import { Uploads } from '../Uploads';
 
 export function NewBidding() {
     const listModalities = [
@@ -83,6 +84,11 @@ export function NewBidding() {
             <InputWrapper>
                 <label>Observações</label>
                 <Textarea placeholder="Digite observações referentes ao processo de licitação" />
+            </InputWrapper>
+
+            <InputWrapper>
+                <label>Anexos</label>
+                <Uploads />
             </InputWrapper>
         </Container>
     );

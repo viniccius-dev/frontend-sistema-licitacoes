@@ -17,6 +17,10 @@ export const Container = styled.aside`
     transform: translateX(-100%);
     transition: transform 0.3s ease-in-out;
 
+    &[data-menu-is-open="true"] {
+        transform: translateX(0);
+    }
+
     @media (min-width: ${DEVICE_BREAKPOINTS.MD}) {
         grid-area: menu;
         position: static;
@@ -56,7 +60,7 @@ export const Nav = styled.nav`
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding: 20px 40px;
+    padding: 20px 24px;
 
     > a {
         position: relative;
@@ -80,4 +84,32 @@ export const Nav = styled.nav`
             right: 24px;
         }
     }
-`
+`;
+
+export const Footer = styled.footer`
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    color: ${({ theme }) => theme.COLORS.WHITE_100};
+    gap: 7px;
+
+    > img {
+        width: 40px;
+        height: 40px;
+        border-radius: 20px;
+    }
+
+    > div {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+    }
+
+    > div strong {
+        font-size: 0.88rem;
+    }
+
+    > div small {
+        font-size: 0.75rem;
+    }
+`;
