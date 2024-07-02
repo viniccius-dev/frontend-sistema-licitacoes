@@ -1,25 +1,42 @@
-import { FiPlus, FiX } from "react-icons/fi";
+import { FiPlus, FiX, FiUpload } from "react-icons/fi";
 
 import { Container } from './styles';
 
 export function ArquiveItem({ isNew, value, onClick, ...rest }) {
     return (
-        <Container isNew={isNew}>
+        <Container $isNew={isNew}>
         {/* TO DO: Mudar esse input do tipo text para type 'file' */}
-            <input 
-                type="text"
-                value={value}
-                readOnly={!isNew}
-                {...rest}
-            />
+            {
+                !isNew ?
 
-            <button
-                type="button"
-                onClick={onClick}
-                className={isNew ? 'button-add' : 'button-delete'}
-            >
-                { isNew ? <FiPlus /> : <FiX />}
-            </button>
+                <input 
+                    type="text"
+                    value={value}
+                    readOnly={!isNew}
+                    {...rest}
+                />
+
+                :
+
+                <label htmlFor="arquive">
+                    <span>Selecionar um arquivo <FiUpload /></span>
+                    <input 
+                        id="arquive"
+                        type="file"
+                    />
+                </label>
+            }
+
+            {
+                !isNew &&
+                <button
+                    type="button"
+                    onClick={onClick}
+                    className="button-delete"
+                >
+                    <FiX />
+                </button>
+            }
         </Container>
     );
 }
