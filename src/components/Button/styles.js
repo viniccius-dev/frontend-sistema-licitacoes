@@ -18,6 +18,10 @@ export const Container = styled.button`
     gap: 1rem;
     justify-content: center;
 
+    > svg {
+        font-size: .9rem;
+    }
+
     &:disabled {
         opacity: 0.8;
     }

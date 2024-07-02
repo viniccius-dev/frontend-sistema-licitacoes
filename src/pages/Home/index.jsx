@@ -1,14 +1,20 @@
-import { Container } from './styles';
+import { Container, FixedContent } from './styles';
 
 import { SideMenu } from '../../components/SideMenu';
 import { Header } from '../../components/Header';
+import { NewBidding } from '../../components/NewBidding';
 
 export function Home() {
+
     return(
         <Container>
             <SideMenu />
 
-            <Header />
+            <FixedContent>
+                <Header />
+            </FixedContent>
+
+            <NewBidding />
         </Container>
     );
 }

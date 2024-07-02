@@ -16,12 +16,20 @@ export const Container = styled.header`
     }
 
     > button:nth-last-of-type(n) {
-        max-width: 130px;
+        max-width: 150px;
+        height: 3rem;
+        margin: 0;
     }
 
-    @media (min-width: ${DEVICE_BREAKPOINTS}) {
+    @media (min-width: ${DEVICE_BREAKPOINTS.SM}) {
         > h1 {
-            font-size: 2rem;
+            font-size: 1.5rem;
+        }
+    }
+
+    @media (min-width: ${DEVICE_BREAKPOINTS.MD}) {
+        > h1 {
+            padding: 0 1rem 0 0;
         }
     }
 `;
@@ -29,15 +37,17 @@ export const Container = styled.header`
 export const Menu = styled.button`
     background: none;
     border: none;
+    display: flex;
+    align-items: center;
 
     > svg {
-        font-size: 2rem;
+        font-size: 1.3rem;
         color: ${({ theme }) => theme.COLORS.BACKGROUND_900};
     }
 
     @media (min-width: ${DEVICE_BREAKPOINTS.XS}) {
         > svg {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
         }
     }
 
