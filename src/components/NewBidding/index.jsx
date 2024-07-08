@@ -4,6 +4,7 @@ import { Input } from '../Input';
 import { InputSelect } from '../InputSelect';
 import { Textarea } from '../Textarea';
 import { Uploads } from '../Uploads';
+import { Button } from '../Button';
 
 export function NewBidding() {
     const listModalities = [
@@ -90,6 +91,21 @@ export function NewBidding() {
                 <label>Anexos</label>
                 <Uploads />
             </InputWrapper>
+
+            <W50>
+                <InputWrapper>
+                    <label>Domínio Vinculado</label>
+
+                    <InputSelect 
+                        title="Selecione o domínio vinculado"
+                        group="modalidades"
+                        options={listModalities}
+                    />
+                </InputWrapper>
+                <InputWrapper>
+                    <Button title="Cadastrar" />
+                </InputWrapper>
+            </W50>
         </Container>
     );
 }

@@ -14,6 +14,17 @@ export const W50 = styled.div`
     margin-bottom: 10px;
     flex-direction: column;
 
+    &:last-of-type {
+        margin-top: 20px;
+
+        > div:last-of-type {
+            display: flex;
+            align-items: end;
+            margin-top: 0;
+            margin-bottom: 8px;
+        }
+    }
+
     @media (min-width: ${DEVICE_BREAKPOINTS.LG}) {
         flex-direction: row;
     }

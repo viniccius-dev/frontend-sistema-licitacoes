@@ -38,4 +38,27 @@ export default createGlobalStyle`
     button:hover, a:hover {
         filter: brightness(0.9);
     }
+
+    ::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background-color: ${({ theme }) => theme.COLORS.GRAY_100};
+        border-radius: 3px;
+        border: 2px solid transparent;
+    }
+
+    ::-webkit-scrollbar-button {
+        display: none;
+    }
+
+    input[type="checkbox"] {
+        margin-right: 5px;
+        border: none;
+    }
 `;
