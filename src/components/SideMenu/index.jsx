@@ -8,7 +8,7 @@ import imgAvatarPlaceholder from "../../assets/avatar_placeholder.svg";
 
 import { Container, Header, Title, Button, Role, Nav, Footer } from './styles';
 
-export function SideMenu({ menuIsOpen, onCloseMenu }) {
+export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
     const [filtersVisible, setFiltersVisible] = useState(false);
     const [activeLink, setActiveLink] = useState("Licitações");
     const modalities = ["Chamada Pública", "Concorrência", "Credenciamento", "Pregão Eletrônico", "Pregão Presencial", "Tomada de Preços"];
@@ -19,7 +19,7 @@ export function SideMenu({ menuIsOpen, onCloseMenu }) {
 
     const handleLinkClick = (linkName) => {
         setActiveLink(linkName);
-
+        onLinkClick(linkName);
         if(linkName !== "Licitações") {
             setFiltersVisible(false);
         }
@@ -52,36 +52,34 @@ export function SideMenu({ menuIsOpen, onCloseMenu }) {
                         <MdAssignment /> Licitações{" "}
                         {filtersVisible ? <MdOutlineKeyboardArrowUp /> : <MdOutlineKeyboardArrowDown />}
                     </div>
-                    {filtersVisible && (
-                        <div className="bidsFilters">
-                            <ul>
-                                <label>Modalidades</label>
-                                {modalities.map((modality, index) => (
-                                    <li key={index}>
-                                        <label>
-                                            <input type="checkbox" value={modality} name="modalities" />
-                                            <span>{modality}</span>
-                                        </label>
-                                    </li>
-                                ))}
-                            </ul>
-                            <ul>
-                                <label>Ano</label>
-                                <li>
+                    <div className="bidsFilters">
+                        <ul>
+                            <label>Modalidades</label>
+                            {modalities.map((modality, index) => (
+                                <li key={index}>
                                     <label>
-                                        <input type="checkbox" value="2024" name="year" />
-                                        <span>2024</span>
+                                        <input type="checkbox" value={modality} name="modalities" />
+                                        <span>{modality}</span>
                                     </label>
                                 </li>
-                                <li>
-                                    <label>
-                                        <input type="checkbox" value="2023" name="year" />
-                                        <span>2023</span>
-                                    </label>
-                                </li>
-                            </ul>
-                        </div>
-                    )}
+                            ))}
+                        </ul>
+                        <ul>
+                            <label>Ano</label>
+                            <li>
+                                <label>
+                                    <input type="checkbox" value="2024" name="year" />
+                                    <span>2024</span>
+                                </label>
+                            </li>
+                            <li>
+                                <label>
+                                    <input type="checkbox" value="2023" name="year" />
+                                    <span>2023</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
                 </a>
                 <a
                     href="#"

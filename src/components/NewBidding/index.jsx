@@ -36,6 +36,7 @@ export function NewBidding() {
                     <Input 
                         placeholder="Digite o n° do processo da modalidade" 
                         background="admin"
+                        maskType="identification"
                     />
                 </InputWrapper>
             </W50>
@@ -55,6 +56,7 @@ export function NewBidding() {
                     <Input 
                         placeholder="Digite o n° do processo licitatório" 
                         background="admin"
+                        maskType="identification"
                     />
                 </InputWrapper>
             </W50>
@@ -65,6 +67,7 @@ export function NewBidding() {
                     <Input
                         placeholder="Digite a data de realização"
                         background="admin"
+                        maskType="date"
                     />
                 </InputWrapper>
                 <InputWrapper>
@@ -73,6 +76,7 @@ export function NewBidding() {
                     <Input 
                         placeholder="Digite o horário de realização" 
                         background="admin"
+                        maskType="time"
                     />
                 </InputWrapper>
             </W50>
