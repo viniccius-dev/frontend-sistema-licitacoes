@@ -5,6 +5,7 @@ import { Container, FixedContent } from './styles';
 import { SideMenu } from '../../components/SideMenu';
 import { Header } from '../../components/Header';
 import { NewBidding } from '../../components/NewBidding';
+import { Users } from '../../components/Users';
 
 export function Home() {
     const [menuIsOpen, setMenuIsOpen] = useState(false);
@@ -14,6 +15,8 @@ export function Home() {
         switch(activeComponent) {
             case "Licitações":
                 return <NewBidding />;
+            case "Usuários":
+                return <Users />;
             default:
                 return null;
         }

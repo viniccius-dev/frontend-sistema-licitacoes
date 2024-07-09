@@ -20,6 +20,7 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
     const handleLinkClick = (linkName) => {
         setActiveLink(linkName);
         onLinkClick(linkName);
+        onCloseMenu();
         if(linkName !== "Licitações") {
             setFiltersVisible(false);
         }
