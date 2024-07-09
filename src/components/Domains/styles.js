@@ -4,6 +4,7 @@ import { DEVICE_BREAKPOINTS } from '../../styles/deviceBreakpoints';
 export const Container = styled.div`
     padding: 0 1.5rem;
     overflow-y: auto;
+    grid-area: content;
 `;
 
 export const W50 = styled.div`

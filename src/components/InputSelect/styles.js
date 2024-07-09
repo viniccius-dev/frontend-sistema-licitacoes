@@ -7,7 +7,7 @@ export const Container = styled.div`
 `;
 
 export const SelectButton = styled.div`
-    height: 3.5rem;
+    height: 3rem;
     display: flex;
     padding: 0.75rem;
     align-items: center;
