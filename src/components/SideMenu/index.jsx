@@ -14,13 +14,17 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
     const modalities = ["Chamada Pública", "Concorrência", "Credenciamento", "Pregão Eletrônico", "Pregão Presencial", "Tomada de Preços"];
 
     const toggleFilters = () => {
-        setFiltersVisible(!filtersVisible);
+        if(activeLink === "Licitações"){
+            setFiltersVisible(!filtersVisible);
+        }
     };
 
     const handleLinkClick = (linkName) => {
+        if(linkName !== "Licitações" || activeLink !== "Licitações" && linkName === "Licitações") {
+            onCloseMenu();
+        }
         setActiveLink(linkName);
         onLinkClick(linkName);
-        onCloseMenu();
         if(linkName !== "Licitações") {
             setFiltersVisible(false);
         }

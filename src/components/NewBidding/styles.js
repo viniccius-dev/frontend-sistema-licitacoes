@@ -3,7 +3,7 @@ import { DEVICE_BREAKPOINTS } from "../../styles/deviceBreakpoints";
 
 export const Container = styled.form`
     grid-area: content;
-    padding: 20px 32px;
+    padding: 1.25rem 1.5rem;
 
     overflow-y: auto;
 `;
