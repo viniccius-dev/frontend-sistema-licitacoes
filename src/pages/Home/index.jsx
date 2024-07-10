@@ -8,6 +8,7 @@ import { Biddings } from '../../components/Biddings';
 import { NewBidding } from '../../components/NewBidding';
 import { Users } from '../../components/Users';
 import { Domains } from '../../components/Domains';
+import { Details } from '../../components/Details';
 
 export function Home() {
     const [menuIsOpen, setMenuIsOpen] = useState(false);
@@ -21,6 +22,8 @@ export function Home() {
                 return <Users />;
             case "Domínios":
                 return <Domains />;
+            case "Nova Licitação":
+                return <NewBidding />;
             default:
                 return null;
         }
@@ -35,10 +38,15 @@ export function Home() {
             />
 
             <FixedContent>
-                <Header onOpenMenu={() => setMenuIsOpen(true)} />
+                <Header 
+                    title={activeComponent} 
+                    onOpenMenu={() => setMenuIsOpen(true)} 
+                    onLinkClick={setActiveComponent}
+                />
             </FixedContent>
             
-            {renderComponent()}
+            <Details />
+            {/* {renderComponent()} */}
         </Container>
     );
 }

@@ -17,8 +17,8 @@ export const Container = styled.header`
     }
 
     > button:nth-last-of-type(n) {
-        max-width: 150px;
-        height: 3rem;
+        max-width: 220px;
+        min-height: 3rem;
         margin: 0;
     }
 
