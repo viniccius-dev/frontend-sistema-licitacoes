@@ -1,12 +1,16 @@
+import { useNavigate } from 'react-router-dom';
+
 import { FaPlus, FaArrowLeft, FaList } from 'react-icons/fa';
 
 import { Button } from '../Button';
 
 import { Container, Menu } from './styles';
 
-export function Header({ onLinkClick, title, onOpenMenu }) {
+export function Header({ title, onOpenMenu }) {
+    const navigate = useNavigate();
+
     function handleLinkClick() {
-        onLinkClick("Nova Licitação");
+        navigate("/create-bidding");
     }
 
     return (

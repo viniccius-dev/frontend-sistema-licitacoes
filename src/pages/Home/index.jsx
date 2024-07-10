@@ -1,52 +1,51 @@
-import { useState } from 'react';
+import { useState,  useEffect } from 'react';
 
-import { Container, FixedContent } from './styles';
+import { Container, Bids } from './styles';
 
-import { SideMenu } from '../../components/SideMenu';
-import { Header } from '../../components/Header';
-import { Biddings } from '../../components/Biddings';
-import { NewBidding } from '../../components/NewBidding';
-import { Users } from '../../components/Users';
-import { Domains } from '../../components/Domains';
-import { Details } from '../../components/Details';
+import { Fixed } from '../../components/Fixed';
+import { Search } from '../../components/Search';
+import { Bid } from '../../components/Bid';
 
 export function Home() {
-    const [menuIsOpen, setMenuIsOpen] = useState(false);
-    const [activeComponent, setActiveComponent] = useState("Licitações");
+    const biddings = [
+        { id: 1, modality_process_number: "01/2023", bidding_process_number: "90/2023", status: "Em andamento", realized_at: "2023-12-15 09:30"},
+        { id: 2, modality_process_number: "01/2023", bidding_process_number: "90/2023", status: "Suspenso", realized_at: "2023-12-15 09:30"},
+        { id: 3, modality_process_number: "01/2023", bidding_process_number: "90/2023", status: "Finalizado", realized_at: "2023-12-15 09:30"},
+        { id: 4, modality_process_number: "01/2023", bidding_process_number: "90/2023", status: "Em andamento", realized_at: "2023-12-15 09:30"},
+    ];
+    const [data, setData] = useState([]);
+    const [filter, setFilter] = useState("all");
 
-    const renderComponent = () => {
-        switch(activeComponent) {
-            case "Licitações":
-                return <Biddings />;
-            case "Usuários":
-                return <Users />;
-            case "Domínios":
-                return <Domains />;
-            case "Nova Licitação":
-                return <NewBidding />;
+    useEffect(() => {
+        switch (filter) {
+            case "inProgress":
+                return setData(biddings.filter((bidding) => bidding.status === "Em andamento"));
+            case "finished":
+                return setData(biddings.filter((bidding) => bidding.status === "Finalizado"));
+            case "suspended":
+                return setData(biddings.filter((bidding) => bidding.status === "Suspenso"));
             default:
-                return null;
+                return setData(biddings);
         }
-    }
+    }, [filter]);
 
     return(
-        <Container>
-            <SideMenu 
-                menuIsOpen={menuIsOpen}
-                onCloseMenu={() => setMenuIsOpen(false)}
-                onLinkClick={setActiveComponent}
-            />
+        <Fixed title="Licitações" route="/">
+            <Container>
+                
+                <Search setFilter={setFilter} data={biddings} filter={filter}/>
 
-            <FixedContent>
-                <Header 
-                    title={activeComponent} 
-                    onOpenMenu={() => setMenuIsOpen(true)} 
-                    onLinkClick={setActiveComponent}
-                />
-            </FixedContent>
-            
-            <Details />
-            {/* {renderComponent()} */}
-        </Container>
+                <Bids>
+                    {
+                        data.map((bid) => (
+                            <Bid 
+                                key={bid.id}
+                                data={bid} 
+                            />
+                        ))
+                    }
+                </Bids>
+            </Container>
+        </Fixed>
     );
 }

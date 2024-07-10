@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { HiOutlineComputerDesktop, HiXMark } from "react-icons/hi2";
 import { MdAssignment, MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
 import { FaUsers } from "react-icons/fa";
@@ -9,25 +10,25 @@ import imgAvatarPlaceholder from "../../assets/avatar_placeholder.svg";
 import { Container, Header, Title, Button, Role, Nav, Footer } from './styles';
 
 export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
+    const navigate = useNavigate();
+
     const [filtersVisible, setFiltersVisible] = useState(false);
-    const [activeLink, setActiveLink] = useState("Licitações");
+    const [activeLink, setActiveLink] = useState(onLinkClick);
     const modalities = ["Chamada Pública", "Concorrência", "Credenciamento", "Pregão Eletrônico", "Pregão Presencial", "Tomada de Preços"];
 
     const toggleFilters = () => {
-        if(activeLink === "Licitações"){
+        if(activeLink === "/"){
             setFiltersVisible(!filtersVisible);
         }
     };
 
-    const handleLinkClick = (linkName) => {
-        if(linkName !== "Licitações" || activeLink !== "Licitações" && linkName === "Licitações") {
+    const handleLinkClick = (e, linkName) => {
+        e.preventDefault();
+        if(linkName !== "/" || activeLink !== "/" && linkName === "/") {
             onCloseMenu();
+            navigate(linkName)
         }
         setActiveLink(linkName);
-        onLinkClick(linkName);
-        if(linkName !== "Licitações") {
-            setFiltersVisible(false);
-        }
     };
 
     return (
@@ -44,12 +45,11 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
 
             <Nav>
                 <a
-                    href="#"
-                    data-menu-active={activeLink === "Licitações"}
+                    data-menu-active={activeLink === "/"}
                     data-filters-active={filtersVisible}
                     className="bidsButton"
-                    onClick={() => {
-                        handleLinkClick("Licitações");
+                    onClick={(e) => {
+                        handleLinkClick(e, "/");
                         toggleFilters();
                     }}
                 >
@@ -87,23 +87,20 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
                     </div>
                 </a>
                 <a
-                    href="#"
-                    data-menu-active={activeLink === "Usuários"}
-                    onClick={() => handleLinkClick("Usuários")}
+                    data-menu-active={activeLink === "/users"}
+                    onClick={(e) => handleLinkClick(e, "/users")}
                 >
                     <FaUsers /> Usuários
                 </a>
                 <a
-                    href="#"
-                    data-menu-active={activeLink === "Domínios"}
-                    onClick={() => handleLinkClick("Domínios")}
+                    data-menu-active={activeLink === "/domains"}
+                    onClick={(e) => handleLinkClick(e, "/domains")}
                 >
                     <TbNetwork /> Domínios
                 </a>
                 <a
-                    href="#"
-                    data-menu-active={activeLink === "Sair"}
-                    onClick={() => handleLinkClick("Sair")}
+                    data-menu-active={activeLink === "/logout"}
+                    onClick={(e) => handleLinkClick(e, "/logout")}
                 >
                     <TbLogout2 /> Sair da Conta
                 </a>
