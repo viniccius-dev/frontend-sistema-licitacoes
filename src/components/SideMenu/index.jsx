@@ -2,15 +2,17 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineComputerDesktop, HiXMark } from "react-icons/hi2";
 import { MdAssignment, MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
-import { FaUsers } from "react-icons/fa";
+import { FaUsers, FaUser } from "react-icons/fa";
 import { TbNetwork, TbLogout2 } from "react-icons/tb";
 
 import imgAvatarPlaceholder from "../../assets/avatar_placeholder.svg";
 
 import { Container, Header, Title, Button, Role, Nav, Footer } from './styles';
+import { useAuth } from '../../hooks/auth';
 
 export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
-    const navigate = useNavigate();
+    const { user, signOut } = useAuth();
+    const navigation = useNavigate();
 
     const [filtersVisible, setFiltersVisible] = useState(false);
     const [activeLink, setActiveLink] = useState(onLinkClick);
@@ -22,11 +24,16 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
         }
     };
 
+    function handleSignOut() {
+        navigation("/");
+        signOut();
+    }
+
     const handleLinkClick = (e, linkName) => {
         e.preventDefault();
         if(linkName !== "/" || activeLink !== "/" && linkName === "/") {
             onCloseMenu();
-            navigate(linkName)
+            navigation(linkName)
         }
         setActiveLink(linkName);
     };
@@ -90,17 +97,21 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
                     data-menu-active={activeLink === "/users"}
                     onClick={(e) => handleLinkClick(e, "/users")}
                 >
-                    <FaUsers /> Usuários
+                    {user.role !== "admin" ? <FaUser />  : <FaUsers /> }
+                    {user.role !== "admin" ? "Perfil" : "Usuários"}
                 </a>
-                <a
-                    data-menu-active={activeLink === "/domains"}
-                    onClick={(e) => handleLinkClick(e, "/domains")}
-                >
-                    <TbNetwork /> Domínios
-                </a>
+                {
+                    user.role === "admin" &&
+                    <a
+                        data-menu-active={activeLink === "/domains"}
+                        onClick={(e) => handleLinkClick(e, "/domains")}
+                    >
+                        <TbNetwork /> Domínios
+                    </a>
+                }
                 <a
                     data-menu-active={activeLink === "/logout"}
-                    onClick={(e) => handleLinkClick(e, "/logout")}
+                    onClick={handleSignOut}
                 >
                     <TbLogout2 /> Sair da Conta
                 </a>
@@ -109,11 +120,11 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
             <Footer>
                 <img src={imgAvatarPlaceholder} alt="Foto do usuário" />
                 <div>
-                    <strong>Marcos Vinícius</strong>
-                    <small>vinicciusdev@gmail.com</small>
+                    <strong>{user.name}</strong>
+                    <small>{user.email}</small>
                 </div>
 
-                <Role type="button">admin</Role>
+                <Role type="button">{user.role}</Role>
             </Footer>
         </Container>
     );

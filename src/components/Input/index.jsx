@@ -1,8 +1,8 @@
-import React from 'react';
+import { forwardRef } from 'react';
 import { Container } from './styles';
 import MaskedInput from 'react-text-mask';
 
-export function Input({ icon: Icon, maskType, background = "default", ...rest }) {
+export const Input = forwardRef(({ icon: Icon, maskType, background = "default", ...rest }, ref) => {
     let mask;
     let guide = true;
 
@@ -39,9 +39,9 @@ export function Input({ icon: Icon, maskType, background = "default", ...rest })
                         {...rest}
                     />
                 ) : (
-                    <input {...rest} />
+                    <input ref={ref} {...rest} />
                 )
             }
         </Container>
     );
-}
+});

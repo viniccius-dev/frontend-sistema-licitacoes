@@ -3,7 +3,7 @@ import { FiChevronDown, FiChevronUp, FiCheck } from "react-icons/fi";
 import { Container, SelectButton, Chevrons, OptionsList, Option } from './styles';
 import { useState, useEffect }  from 'react';
 
-export function InputSelect({ title, group, options, onSelect, selected }) {
+export function InputSelect({ title, group, options, onSelect, selected, objectValue }) {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState(selected || null);
 
@@ -25,7 +25,7 @@ export function InputSelect({ title, group, options, onSelect, selected }) {
         <Container>
             <SelectButton onClick={toggleDropdown}>
                 <div>
-                    {selectedOption ? selectedOption.name : title}
+                    {selectedOption ? selectedOption[objectValue] : title}
                 </div>
 
                 <Chevrons>
@@ -40,12 +40,12 @@ export function InputSelect({ title, group, options, onSelect, selected }) {
                             <input 
                                 type="radio"
                                 name={group}
-                                value={option.name}
-                                checked={selectedOption && selectedOption.name === option.name}
+                                value={option[objectValue]}
+                                checked={selectedOption && selectedOption[objectValue] === option[objectValue]}
                                 readOnly
                             />
-                            <span>{option.name}</span>
-                            {selectedOption && selectedOption.name === option.name && <FiCheck />}
+                            <span>{option[objectValue]}</span>
+                            {selectedOption && selectedOption[objectValue] === option[objectValue] && <FiCheck />}
                         </Option>
                     ))}
                 </OptionsList>
