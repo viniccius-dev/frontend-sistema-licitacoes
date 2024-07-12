@@ -34,6 +34,24 @@ function AuthProvider({ children }) {
         setData({});
     }
 
+    async function updateProfile({ user, sessionUpdated }) {
+        try {
+            await api.put("/users", user);
+
+            if(sessionUpdated) {
+                localStorage.setItem("@biddingsnew:user", JSON.stringify(sessionUpdated));
+                setData({ user: sessionUpdated, token: data.token });
+            }
+            alert("Perfil atualizado!");
+        } catch(error) {
+            if(error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("Não foi possível atualizar o perfil.");
+            }
+        }
+    };
+
     useEffect(() => {
         const token = localStorage.getItem("@biddingsnew:token");
         const user = localStorage.getItem("@biddingsnew:user");
@@ -52,6 +70,7 @@ function AuthProvider({ children }) {
         <AuthContext.Provider value ={{
             signIn,
             signOut,
+            updateProfile,
             user: data.user,
             loading
         }}>

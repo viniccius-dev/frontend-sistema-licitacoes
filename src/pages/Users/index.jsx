@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Container, W50, InputWrapper } from './styles';
 
 import { api } from '../../services/api';
@@ -10,7 +10,7 @@ import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
 
 export function Users() {
-    const { user } = useAuth();
+    const { user, updateProfile } = useAuth();
     
     const [users, setUsers] = useState([]);
     const [domains, setDomains] = useState([]);
@@ -18,75 +18,122 @@ export function Users() {
     const [selectedDomain, setSelectedDomain] = useState(null);
     const [modeEdit, setModeEdit] = useState(user.role === "admin" ? false : true);
 
-    const nameRef = useRef(null);
-    const emailRef = useRef(null);
-    const oldPasswordRef = useRef(null);
-    const newPasswordRef = useRef(null);
-
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
 
+    const clearFields = useCallback(() => {
+        setSelectedUser(null);
+        setSelectedDomain(null);
+        setName("");
+        setEmail("");
+        setOldPassword("");
+        setNewPassword("");
+        setModeEdit(false);
+    }, []);
+
     const handleModeUpdate = useCallback(() => {
-        if(selectedUser) {
+        if (selectedUser) {
             setModeEdit(!modeEdit);
-            if(!modeEdit) {
-                nameRef.current.value = selectedUser.name;
-                emailRef.current.value = selectedUser.email;
+            if (!modeEdit) {
+                setName(selectedUser.name);
+                setEmail(selectedUser.email);
+
+                const nameDomain = domains.find(domain => domain.id === selectedUser.domain_id);
+                setSelectedDomain(nameDomain);
             } else {
-                nameRef.current.value = "";
-                emailRef.current.value = "";
-                setSelectedUser(null);
+                clearFields();
             }
         }
-    }, [selectedUser, modeEdit]);
+    }, [selectedUser, modeEdit, domains, clearFields]);
 
-    function handleSendForm() {
-        if(!modeEdit) {
-            if(!name || !email || !newPassword || !selectedDomain) {
-                return alert("Preencha todos os campos!");
-            }
+    const fetchGetUsersAndDomains = useCallback(async () => {
+        const responseUsers = await api.get("/users");
+        const responseDomains = await api.get("/domains");
+        setUsers(responseUsers.data);
+        setDomains(responseDomains.data);
+    }, []);
 
+    const handleSendForm = useCallback(async () => {
+        if (!modeEdit) {
             api.post("/users", { 
                 name, 
                 email, 
                 password: newPassword,
-                domain_id: selectedDomain.id 
+                domain_id: selectedDomain?.id 
             })
             .then(() => {
-                alert("Usuário cadastro com sucesso!");
+                alert("Usuário cadastrado com sucesso!");
+                fetchGetUsersAndDomains();
+                clearFields();
             })
             .catch(error => {
-                if(error.response){
+                if (error.response) {
                     alert(error.response.data.message);
                 } else {
                     alert("Não foi possível cadastrar");
                 }
-            })
+            });
+        } else {
+            const updated = {
+                name,
+                email,
+                password: newPassword,
+                old_password: oldPassword,
+                domain_id: selectedDomain?.id,
+                modify_user_id: selectedUser?.id
+            }
+            let sessionUpdated;
+
+            if(user.id === selectedUser?.id || user.role !== "admin") {
+                const dataUpdated = {
+                    name: name !== '' ? name : user.name,
+                    email: email !== '' ? email : user.email,
+                }
+                sessionUpdated = { ...user, ...dataUpdated };
+            }
+
+            await updateProfile({ user: updated, sessionUpdated });
+            fetchGetUsersAndDomains();
         }
-    }
-    
+    }, [name, email, newPassword, oldPassword, selectedDomain, modeEdit, selectedUser, user, updateProfile, fetchGetUsersAndDomains, clearFields]);
+
+    const handleDeleteUser = useCallback(async () => {
+        try {
+            const confirm = window.confirm("Deseja realmente deletar o perfil?");
+
+            if(confirm) {
+                await api.delete(`/users/${selectedUser?.id}`);
+                alert("Perfil deletado com sucesso.");
+                fetchGetUsersAndDomains();
+                clearFields();
+            }
+        } catch(error) {
+            if(error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("Não foi possível atualizar o perfil.");
+            }
+        }
+    }, [selectedUser, fetchGetUsersAndDomains, clearFields]);
+
     const handleSelectUser = useCallback((option) => {
+        if (selectedUser && selectedUser.id !== option.id) {
+            clearFields();
+        }
         setSelectedUser(option);
-    }, []);
+    }, [selectedUser, clearFields]);
 
     const handleSelectDomain = useCallback((option) => {
         setSelectedDomain(option);
     }, []);
 
     useEffect(() => {
-        if(user.role === "admin") {
-            async function fetchGetUsersAndDomains() {
-                const responseUsers = await api.get("/users");
-                const responseDomains = await api.get("/domains");
-                setUsers(responseUsers.data);
-                setDomains(responseDomains.data);
-            }
-
+        if (user.role === "admin") {
             fetchGetUsersAndDomains();
         }
-    }, [handleSendForm]);
+    }, [user.role, fetchGetUsersAndDomains]);
 
     return (
         <Fixed title="Usuários" route="/users">
@@ -108,7 +155,11 @@ export function Users() {
                                 />
                             </InputWrapper>
                             <InputWrapper className="buttons">
-                                <Button title="Excluir" background="admin" />
+                                <Button 
+                                    title="Excluir" 
+                                    background="admin" 
+                                    onClick={handleDeleteUser}
+                                />
                                 <Button 
                                     title={modeEdit ? "Limpar" : "Editar"}
                                     onClick={handleModeUpdate}
@@ -126,8 +177,8 @@ export function Users() {
                             <Input 
                                 placeholder="Digite o nome"
                                 background="admin"
+                                value={name}
                                 onChange={e => setName(e.target.value)}
-                                ref={nameRef}
                             />
                         </InputWrapper>
                         
@@ -138,8 +189,8 @@ export function Users() {
                                 type="email"
                                 placeholder="Digite o e-mail"
                                 background="admin"
+                                value={email}
                                 onChange={e => setEmail(e.target.value)}
-                                ref={emailRef}
                             />
                         </InputWrapper>
                     </W50>
@@ -148,16 +199,16 @@ export function Users() {
                         {
                             modeEdit &&                        
                             <InputWrapper>
-                            <label>Senha Antiga</label>
+                                <label>Senha Antiga</label>
 
-                            <Input
-                                type="password"
-                                placeholder="Digite a nova senha"
-                                background="admin"
-                                onChange={e => setOldPassword(e.target.value)}
-                                ref={oldPasswordRef}
-                            />
-                        </InputWrapper>
+                                <Input
+                                    type="password"
+                                    placeholder="Digite a senha antiga"
+                                    background="admin"
+                                    value={oldPassword}
+                                    onChange={e => setOldPassword(e.target.value)}
+                                />
+                            </InputWrapper>
                         }
 
                         <InputWrapper>
@@ -165,16 +216,17 @@ export function Users() {
 
                             <Input 
                                 type="password"
-                                placeholder={modeEdit ? "Digite a senha antiga" : "Digite a senha"}
+                                placeholder={modeEdit ? "Digite a nova senha" : "Digite a senha"}
                                 background="admin"
+                                value={newPassword}
                                 onChange={e => setNewPassword(e.target.value)}
-                                ref={newPasswordRef}
                             />
                         </InputWrapper>
                     </W50>
+                    
                     <W50>
                         {
-                            user.role === "admin" &&
+                            user.role === "admin" && (!modeEdit || (modeEdit && selectedUser?.domain_id !== null)) &&
                             <InputWrapper>
                                 <label>Domínio Vinculado</label>
 
@@ -193,6 +245,5 @@ export function Users() {
                 </Section>
             </Container>
         </Fixed>
-        
     );
 }
