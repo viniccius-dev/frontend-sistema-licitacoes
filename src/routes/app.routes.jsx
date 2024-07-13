@@ -14,6 +14,8 @@ export function LoggRoutes() {
             <Route path="/domains" element={<Domains />} />
             <Route path="/create-bidding" element={<NewBidding />} />
             <Route path="/bidding/:id" element={<Details />} />
+
+            <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );
 }

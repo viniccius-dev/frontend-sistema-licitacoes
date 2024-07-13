@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
-
+import { jwtDecode } from "jwt-decode";
 import { api } from "../services/api";
 
 export const AuthContext = createContext({});
@@ -8,10 +8,20 @@ function AuthProvider({ children }) {
     const [data, setData] = useState({});
     const [loading, setLoading] = useState(true);
 
+    function isTokenExpired(token) {
+        const { exp } = jwtDecode(token);
+        const expirationTime = exp * 1000; // Convert to milliseconds
+        return Date.now() > expirationTime;
+    }
+
     async function signIn({ email, password }) {
         try {
             const response = await api.post("/sessions", { email, password });
             const { user, token } = response.data;
+
+            if (isTokenExpired(token)) {
+                throw new Error("Token expirado");
+            }
     
             localStorage.setItem("@biddingsnew:user", JSON.stringify(user));
             localStorage.setItem("@biddingsnew:token", token);
@@ -21,6 +31,8 @@ function AuthProvider({ children }) {
         } catch(error) {
             if(error.response) {
                 alert(error.response.data.message);
+            } else if (error.message === "Token expirado") {
+                alert("Token expirado. Por favor, faça login novamente.");
             } else {
                 alert("Não foi possivel entrar.");
             }
@@ -57,11 +69,15 @@ function AuthProvider({ children }) {
         const user = localStorage.getItem("@biddingsnew:user");
 
         if(token && user) {
-            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-            setData({
-                token,
-                user: JSON.parse(user)
-            })
+            if (!isTokenExpired(token)) {
+                api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+                setData({
+                    token,
+                    user: JSON.parse(user)
+                });
+            } else {
+                signOut();
+            }
         }
         setLoading(false);
     }, []);

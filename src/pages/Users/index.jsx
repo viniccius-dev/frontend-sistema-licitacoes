@@ -49,10 +49,12 @@ export function Users() {
     }, [selectedUser, modeEdit, domains, clearFields]);
 
     const fetchGetUsersAndDomains = useCallback(async () => {
-        const responseUsers = await api.get("/users");
-        const responseDomains = await api.get("/domains");
-        setUsers(responseUsers.data);
-        setDomains(responseDomains.data);
+        if(user.role === "admin") {
+            const responseUsers = await api.get("/users");
+            const responseDomains = await api.get("/domains");
+            setUsers(responseUsers.data);
+            setDomains(responseDomains.data);
+        }
     }, []);
 
     const handleSendForm = useCallback(async () => {
@@ -72,7 +74,7 @@ export function Users() {
                 if (error.response) {
                     alert(error.response.data.message);
                 } else {
-                    alert("Não foi possível cadastrar");
+                    alert("Não foi possível cadastrar o usuário");
                 }
             });
         } else {
@@ -113,7 +115,7 @@ export function Users() {
             if(error.response) {
                 alert(error.response.data.message);
             } else {
-                alert("Não foi possível atualizar o perfil.");
+                alert("Não foi possível deletar o perfil.");
             }
         }
     }, [selectedUser, fetchGetUsersAndDomains, clearFields]);
