@@ -1,11 +1,16 @@
-import { FiPlus, FiX, FiUpload } from "react-icons/fi";
+import { FiX, FiUpload } from "react-icons/fi";
 
 import { Container } from './styles';
 
-export function ArquiveItem({ isNew, value, onClick, ...rest }) {
+export function ArquiveItem({ isNew, value, fileUrl, onClick, onFileChange, ...rest }) {
+    const handleOpenFile = () => {
+        if(fileUrl) {
+            window.open(fileUrl, '_blank');
+        }
+    }
+
     return (
         <Container $isNew={isNew}>
-        {/* TO DO: Mudar esse input do tipo text para type 'file' */}
             {
                 !isNew ?
 
@@ -13,7 +18,9 @@ export function ArquiveItem({ isNew, value, onClick, ...rest }) {
                     type="text"
                     value={value}
                     readOnly={!isNew}
+                    onClick={handleOpenFile}
                     {...rest}
+                    title={value}
                 />
 
                 :
@@ -23,6 +30,8 @@ export function ArquiveItem({ isNew, value, onClick, ...rest }) {
                     <input 
                         id="arquive"
                         type="file"
+                        onChange={onFileChange}
+                        accept=".pdf,.doc,.docx,.xls,.xlsx"
                     />
                 </label>
             }

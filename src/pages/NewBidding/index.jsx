@@ -1,4 +1,10 @@
+import { useState, useEffect } from 'react';
+
 import { Container, W50, InputWrapper } from './styles';
+
+import { useAuth } from '../../hooks/auth';
+import { api } from '../../services/api';
+import { listModalities, listStatus } from '../../utils/biddingVar';
 
 import { Input } from '../../components/Input';
 import { InputSelect } from '../../components/InputSelect';
@@ -8,16 +14,98 @@ import { Button } from '../../components/Button';
 import { Fixed } from '../../components/Fixed';
 
 export function NewBidding() {
-    const listModalities = [
-        {id: 1, name: "Chamada Pública"},
-        {id: 2, name: "Pregão Eletrônico"}
-    ];
+    const { user } = useAuth();
 
-    const listStatus = [
-        {id: 1, name: "Em Andamento"},
-        {id: 2, name: "Finalizado"},
-        {id: 3, name: "Suspenso"}
-    ]
+    const [domains, setDomains] = useState([]);
+    const [selectedModality, setSelectedModality] = useState(null);
+    const [selectedStatus, setSelectedStatus] = useState(null);
+    const [selectedDomain, setSelectedDomain] = useState(null);
+
+    const [numModalityProcess, setNumModalityProcess] = useState("");
+    const [numBidProcess, setNumBidProcess] = useState("");
+    const [date, setDate] = useState("");
+    const [hour, setHour] = useState("");
+    const [object, setObject] = useState("");
+    const [observations, setObservations] = useState("");
+    const [files, setFiles] = useState([]);
+
+    const handleFilesChange = (newFiles) => {
+        setFiles(newFiles);
+    };
+
+    const isValidDateTime = (dateString, timeString) => {
+        const [day, month, year] = dateString.split('/');
+        const [hours, minutes] = timeString.split(':');
+        const date = new Date(year, month - 1, day, hours, minutes);
+        return !isNaN(date.getTime());
+    };
+
+    const formatDateTime = (dateString, timeString) => {
+        const [day, month, year] = dateString.split('/');
+        const [hours, minutes] = timeString.split(':');
+        const date = new Date(year, month - 1, day, hours, minutes);
+        return date.toISOString().slice(0, 16).replace('T', ' ');
+    };
+
+    const handleSubmit = async () => {
+        if(!isValidDateTime(date, hour)) {
+            alert("Data ou hora inválida. Por favor, verifique os valores inseridos.");
+            return;
+        }
+
+        const formattedDateTime = formatDateTime(date, hour);
+
+        const biddingData = {
+            bidding_modality: selectedModality.name,
+            bidding_process_number: numBidProcess,
+            modality_process_number: numModalityProcess,
+            status: selectedStatus.name,
+            object,
+            observations,
+            realized_at: formattedDateTime,
+            domain_id: selectedDomain?.id
+        };
+
+        try {
+            const biddingResponse = await api.post("/bids", biddingData);
+
+            if(files.length > 0) {
+                const formData = new FormData();
+                files.forEach(fileObj => {
+                    formData.append("attachment", fileObj.file);
+                });
+
+                await api.post(`/bids/attachments/${biddingResponse.data.bid.id}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+            }
+
+            alert("Licitação cadastrada com sucesso!");
+        } catch (error) {
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("Erro ao cadastrar a licitação.");
+            }
+        }
+
+    };
+
+    useEffect(() => {
+        if (user.role === "admin") {
+            api.get("/domains")
+            .then((response) => setDomains(response.data))
+            .catch(error => {
+                if (error.response) {
+                    alert(error.response.data.message);
+                } else {
+                    alert("Não foi acessar dados do domínio");
+                }
+            });
+        }
+    }, [user.role]);
 
     return (
         <Fixed title="Nova Licitação" route="/">
@@ -28,8 +116,11 @@ export function NewBidding() {
 
                         <InputSelect 
                             title="Selecione a Modalidade da Licitação"
-                            group="modalidades"
+                            group="modalities"
                             options={listModalities}
+                            objectValue="name"
+                            onSelect={option => setSelectedModality(option)}
+                            selected={selectedModality}
                         />
                     </InputWrapper>
                     <InputWrapper>
@@ -39,6 +130,8 @@ export function NewBidding() {
                             placeholder="Digite o n° do processo da modalidade" 
                             background="admin"
                             maskType="identification"
+                            value={numModalityProcess}
+                            onChange={(e) => setNumModalityProcess(e.target.value)}
                         />
                     </InputWrapper>
                 </W50>
@@ -50,6 +143,9 @@ export function NewBidding() {
                             title="Selecione o status do processo"
                             group="status"
                             options={listStatus}
+                            objectValue="name"
+                            onSelect={option => setSelectedStatus(option)}
+                            selected={selectedStatus}
                         />
                     </InputWrapper>
                     <InputWrapper>
@@ -59,6 +155,8 @@ export function NewBidding() {
                             placeholder="Digite o n° do processo licitatório" 
                             background="admin"
                             maskType="identification"
+                            value={numBidProcess}
+                            onChange={(e) => setNumBidProcess(e.target.value)}
                         />
                     </InputWrapper>
                 </W50>
@@ -70,6 +168,8 @@ export function NewBidding() {
                             placeholder="Digite a data de realização"
                             background="admin"
                             maskType="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
                         />
                     </InputWrapper>
                     <InputWrapper>
@@ -79,37 +179,55 @@ export function NewBidding() {
                             placeholder="Digite o horário de realização" 
                             background="admin"
                             maskType="time"
+                            value={hour}
+                            onChange={(e) => setHour(e.target.value)}
                         />
                     </InputWrapper>
                 </W50>
 
                 <InputWrapper>
                     <label>Objeto</label>
-                    <Textarea placeholder="Digite a descrição do objeto da licitação" />
+                    <Textarea 
+                        placeholder="Digite a descrição do objeto da licitação" 
+                        onChange={(e) => setObject(e.target.value)}
+                    />
                 </InputWrapper>
 
                 <InputWrapper>
                     <label>Observações</label>
-                    <Textarea placeholder="Digite observações referentes ao processo de licitação" />
+                    <Textarea 
+                        placeholder="Digite observações referentes ao processo de licitação" 
+                        onChange={(e) => setObservations(e.target.value)}
+                    />
                 </InputWrapper>
 
                 <InputWrapper>
                     <label>Anexos</label>
-                    <Uploads />
+                    <Uploads onFilesChange={handleFilesChange} />
                 </InputWrapper>
 
                 <W50>
-                    <InputWrapper>
-                        <label>Domínio Vinculado</label>
+                    {
+                        user.role == "admin" &&
 
-                        <InputSelect 
-                            title="Selecione o domínio vinculado"
-                            group="modalidades"
-                            options={listModalities}
-                        />
-                    </InputWrapper>
+                        <InputWrapper>
+                            <label>Domínio Vinculado</label>
+
+                            <InputSelect 
+                                title="Selecione o domínio vinculado"
+                                group="domains"
+                                options={domains}
+                                objectValue="domain_name"
+                                onSelect={option => setSelectedDomain(option)}
+                                selected={selectedDomain}
+                            />
+                        </InputWrapper>
+                    }
                     <InputWrapper>
-                        <Button title="Cadastrar" />
+                        <Button 
+                            title="Cadastrar" 
+                            onClick={handleSubmit}    
+                        />
                     </InputWrapper>
                 </W50>
             </Container>
