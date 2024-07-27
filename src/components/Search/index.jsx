@@ -6,7 +6,7 @@ import { Filter } from '../Filter';
 
 export function Search({ data, filter, setFilter }) {
 
-    const inProgress = data.filter((bidding) => bidding.status === "Em andamento");
+    const inProgress = data.filter((bidding) => bidding.status === "Em Andamento");
     const finished = data.filter((bidding) => bidding.status === "Finalizado");
     const suspended = data.filter((bidding) => bidding.status === "Suspenso");
 
@@ -21,26 +21,26 @@ export function Search({ data, filter, setFilter }) {
             <Filters>
                 <Filter 
                     title={`Tudo (${data.length})`}
-                    onClick={() => setFilter("all")}
-                    selected={filter === "all"}
+                    onClick={() => setFilter("Tudo")}
+                    selected={filter === "Tudo"}
                 />
 
                 <Filter 
                     title={`Em andamento (${inProgress.length})`}
-                    onClick={() => setFilter("inProgress")}
-                    selected={filter === "inProgress"}
+                    onClick={() => setFilter("Em Andamento")}
+                    selected={filter === "Em Andamento"}
                 />
 
                 <Filter 
                     title={`Finalizados (${finished.length})`}
-                    onClick={() => setFilter("finished")}
-                    selected={filter === "finished"}
+                    onClick={() => setFilter("Finalizado")}
+                    selected={filter === "Finalizado"}
                 />
 
                 <Filter 
                     title={`Suspensos (${suspended.length})`}
-                    onClick={() => setFilter("suspended")}
-                    selected={filter === "suspended"}
+                    onClick={() => setFilter("Suspenso")}
+                    selected={filter === "Suspenso"}
                 />
             </Filters>
         </Container>

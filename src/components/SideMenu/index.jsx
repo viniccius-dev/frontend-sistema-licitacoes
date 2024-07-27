@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineComputerDesktop, HiXMark } from "react-icons/hi2";
 import { MdAssignment, MdOutlineKeyboardArrowDown, MdOutlineKeyboardArrowUp } from "react-icons/md";
@@ -6,6 +6,7 @@ import { FaUsers, FaUser } from "react-icons/fa";
 import { TbNetwork, TbLogout2 } from "react-icons/tb";
 
 import imgAvatarPlaceholder from "../../assets/avatar_placeholder.svg";
+import { api } from "../../services/api";
 
 import { Container, Header, Title, Button, Role, Nav, Footer } from './styles';
 import { useAuth } from '../../hooks/auth';
@@ -16,7 +17,12 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
 
     const [filtersVisible, setFiltersVisible] = useState(false);
     const [activeLink, setActiveLink] = useState(onLinkClick);
-    const modalities = ["Chamada Pública", "Concorrência", "Credenciamento", "Pregão Eletrônico", "Pregão Presencial", "Tomada de Preços"];
+    const [modalities, setModalities] = useState([]);
+    const [years, setYears] = useState([]);
+    const [domains, setDomains] = useState([]);
+    const [selectedModalities, setSelectedModalities] = useState([]);
+    const [selectedYears, setSelectedYears] = useState([]);
+    const [selectedDomains, setSelectedDomains] = useState([]);
 
     const toggleFilters = () => {
         if(activeLink === "/"){
@@ -30,13 +36,83 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
     }
 
     const handleLinkClick = (e, linkName) => {
-        e.preventDefault();
         if(linkName !== "/" || activeLink !== "/" && linkName === "/") {
             onCloseMenu();
             navigation(linkName)
         }
         setActiveLink(linkName);
     };
+
+    const handleModalitiesChange = (e) => {
+        const { value, checked } = e.target;
+        setSelectedModalities(prev => {
+            if (checked) {
+                return [...prev, value];
+            } else {
+                return prev.filter(modality => modality !== value);
+            }
+        });
+    };
+
+    const handleYearsChange = (e) => {
+        const { value, checked } = e.target;
+        setSelectedYears(prev => {
+            if (checked) {
+                return [...prev, value];
+            } else {
+                return prev.filter(year => year !== value);
+            }
+        });
+    };
+
+    const handleDomainsChange = (e) => {
+        const { value, checked } = e.target;
+        setSelectedDomains(prev => {
+            if (checked) {
+                return [...prev, value];
+            } else {
+                return prev.filter(domain => domain !== value);
+            }
+        });
+    };
+
+    useEffect(() => {
+        async function fetchFilters() {
+            try {
+                const response = await api.get("/bids/filters");
+                setModalities(response.data.modalities);
+                setYears(response.data.years);
+                setDomains(response.data.domains);
+            } catch (error) {
+                if (error.response) {
+                    alert(error.response.data.message);
+                } else {
+                    alert("Não foi acessar dados do domínio");
+                }
+            }
+        }
+        
+        fetchFilters();
+    }, [setModalities, setYears]);
+
+    useEffect(() => {
+        const queryParams = new URLSearchParams();
+        if (selectedModalities.length) {
+            queryParams.append('modalities', selectedModalities.join(','));
+        }
+        if (selectedYears.length) {
+            queryParams.append('years', selectedYears.join(','));
+        }
+        if (selectedDomains.length) {
+            queryParams.append('domains', selectedDomains.join(','));
+        }
+        const queryString = queryParams.toString();
+        if (queryString) {
+            navigation(`/?${queryString}`);
+        } else if (activeLink === "/") {
+            navigation('/');
+        }
+    }, [selectedModalities, selectedYears, selectedDomains, navigation]);
 
     return (
         <Container data-menu-is-open={menuIsOpen}>
@@ -52,25 +128,51 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
 
             <Nav>
                 <a
-                    data-menu-active={activeLink === "/"}
+                    data-menu-active={activeLink === "/" || activeLink === "/create-bidding"}
                     data-filters-active={filtersVisible}
                     className="bidsButton"
+                    style={{cursor: "default"}}
                     onClick={(e) => {
                         handleLinkClick(e, "/");
-                        toggleFilters();
                     }}
                 >
-                    <div>
+                    <div onClick={toggleFilters} style={{cursor: "pointer"}}>
                         <MdAssignment /> Licitações{" "}
                         {filtersVisible ? <MdOutlineKeyboardArrowUp /> : <MdOutlineKeyboardArrowDown />}
                     </div>
                     <div className="bidsFilters">
+                        {
+                            user.role === "admin" &&
+                            <ul>
+                                <label>Domínios</label>
+                                {domains.map((domain, index) => (
+                                    <li key={index}>
+                                        <label>
+                                            <input 
+                                                type="checkbox" 
+                                                value={domain} 
+                                                name="domains" 
+                                                onChange={handleDomainsChange}
+                                                checked={selectedDomains.includes(domain)}
+                                            />
+                                            <span>{domain}</span>
+                                        </label>
+                                    </li>
+                                ))}
+                            </ul>
+                        }
                         <ul>
                             <label>Modalidades</label>
                             {modalities.map((modality, index) => (
                                 <li key={index}>
                                     <label>
-                                        <input type="checkbox" value={modality} name="modalities" />
+                                        <input 
+                                            type="checkbox" 
+                                            value={modality} 
+                                            name="modalities" 
+                                            onChange={handleModalitiesChange}
+                                            checked={selectedModalities.includes(modality)}
+                                        />
                                         <span>{modality}</span>
                                     </label>
                                 </li>
@@ -78,18 +180,20 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
                         </ul>
                         <ul>
                             <label>Ano</label>
-                            <li>
-                                <label>
-                                    <input type="checkbox" value="2024" name="year" />
-                                    <span>2024</span>
-                                </label>
-                            </li>
-                            <li>
-                                <label>
-                                    <input type="checkbox" value="2023" name="year" />
-                                    <span>2023</span>
-                                </label>
-                            </li>
+                            {years.map((year, index) => (
+                                <li key={index}>
+                                    <label>
+                                        <input 
+                                            type="checkbox" 
+                                            value={year} 
+                                            name="years" 
+                                            onChange={handleYearsChange}
+                                            checked={selectedYears.includes(String(year))}
+                                        />
+                                        <span>{year}</span>
+                                    </label>
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 </a>

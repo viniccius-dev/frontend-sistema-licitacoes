@@ -108,7 +108,7 @@ export function NewBidding() {
     }, [user.role]);
 
     return (
-        <Fixed title="Nova Licitação" route="/">
+        <Fixed title="Nova Licitação" route="/create-bidding">
             <Container>
                 <W50>
                     <InputWrapper>
