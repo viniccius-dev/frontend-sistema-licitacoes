@@ -128,7 +128,12 @@ export function SideMenu({ menuIsOpen, onCloseMenu, onLinkClick }) {
 
             <Nav>
                 <a
-                    data-menu-active={activeLink === "/" || activeLink === "/create-bidding"}
+                    data-menu-active={
+                        activeLink === "/" || 
+                        activeLink === "/create-bidding" || 
+                        activeLink === "/details" ||
+                        activeLink === "/edit-bidding"
+                    }
                     data-filters-active={filtersVisible}
                     className="bidsButton"
                     style={{cursor: "default"}}

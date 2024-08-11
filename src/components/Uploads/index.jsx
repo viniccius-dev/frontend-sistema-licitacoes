@@ -10,13 +10,13 @@ export function Uploads({ onFilesChange }) {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if(file) {
-            if(file.size <= 15 * 1024 * 1024) { // Check file size (15 MB)
+            if(file.size <= 50 * 1024 * 1024) { // Check file size (50 MB)
                 const fileUrl = URL.createObjectURL(file);
                 const newFiles = [...files, { file, fileUrl }];
                 setFiles(newFiles);
                 onFilesChange(newFiles)
             } else {
-                alert("Arquivo muito grande. O tamanho máximo é de 15 MB.");
+                alert("Arquivo muito grande. O tamanho máximo é de 50 MB.");
             }
         };
         } 

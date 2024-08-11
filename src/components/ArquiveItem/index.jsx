@@ -31,7 +31,7 @@ export function ArquiveItem({ isNew, value, fileUrl, onClick, onFileChange, ...r
                         id="arquive"
                         type="file"
                         onChange={onFileChange}
-                        accept=".pdf,.doc,.docx,.xls,.xlsx"
+                        accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.ppt,.pptx,.png,.jpg"
                     />
                 </label>
             }

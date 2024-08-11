@@ -16,6 +16,7 @@ export const Container = styled.div`
         height: 3rem;
 
         padding: .75rem;
+        border-radius: .63rem;
 
         color: ${({ theme, $background  }) => $background === "default" ? theme.COLORS.BACKGROUND_900 : theme.COLORS.WHITE_100};
         background: transparent;
@@ -23,6 +24,15 @@ export const Container = styled.div`
 
         &::placeholder {
             color: ${({ theme }) => theme.COLORS.GRAY_300};
+        }
+
+        &:disabled {
+            background-color: ${({ theme }) => theme.COLORS.GRAY_500};
+            border-width: 1px;
+            border-style: dotted;
+            border-color: ${({ theme }) => theme.COLORS.GRAY_100};
+            font-weight: 500;
+            color: ${({ theme }) => theme.COLORS.GRAY_100};
         }
     }
 

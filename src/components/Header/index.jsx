@@ -9,6 +9,10 @@ import { Container, Menu } from './styles';
 export function Header({ title, onOpenMenu }) {
     const navigate = useNavigate();
 
+    function handleBack() {
+        navigate(-1);
+    }
+
     function handleLinkClick() {
         navigate("/create-bidding");
     }
@@ -23,7 +27,7 @@ export function Header({ title, onOpenMenu }) {
             {
                 title !== "Licitações" 
                 ?
-                <Button icon={FaArrowLeft} title="Voltar" /> 
+                <Button icon={FaArrowLeft} title="Voltar" onClick={handleBack} /> 
                 :
                 <Button icon={FaPlus} title="Adicionar Licitação" onClick={handleLinkClick} />
             }

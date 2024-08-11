@@ -10,8 +10,6 @@ export const Container = styled.div`
         flex-direction: column;
         gap: 5px;
 
-
-
         small { 
             display: flex; 
             align-items: center; 
@@ -26,4 +24,16 @@ export const Container = styled.div`
     section h2 {
         margin-bottom: 1rem;
     }
+
+    footer {
+        display: flex;
+        gap: 10px;
+    }
+`;
+
+export const NotFound = styled.div`
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+    justify-content: center;
 `;

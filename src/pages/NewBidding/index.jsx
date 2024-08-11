@@ -43,8 +43,11 @@ export function NewBidding() {
     const formatDateTime = (dateString, timeString) => {
         const [day, month, year] = dateString.split('/');
         const [hours, minutes] = timeString.split(':');
-        const date = new Date(year, month - 1, day, hours, minutes);
-        return date.toISOString().slice(0, 16).replace('T', ' ');
+        
+        const formattedDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const formattedTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+        
+        return `${formattedDate} ${formattedTime}`;
     };
 
     const handleSubmit = async () => {
@@ -101,7 +104,7 @@ export function NewBidding() {
                 if (error.response) {
                     alert(error.response.data.message);
                 } else {
-                    alert("Não foi acessar dados do domínio");
+                    alert("Não foi possível acessar dados do domínio");
                 }
             });
         }

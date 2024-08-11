@@ -4,7 +4,7 @@ import { Container, Filters } from './styles';
 import { Input } from '../Input';
 import { Filter } from '../Filter';
 
-export function Search({ data, filter, setFilter }) {
+export function Search({ data, filter, setFilter, setSearch }) {
 
     const inProgress = data.filter((bidding) => bidding.status === "Em Andamento");
     const finished = data.filter((bidding) => bidding.status === "Finalizado");
@@ -15,6 +15,7 @@ export function Search({ data, filter, setFilter }) {
             <Input 
                 icon={FiSearch}
                 placeholder="Pesquisar licitação..."
+                onChange={(e) => setSearch(e.target.value)}
                 background="admin"
             />
 
