@@ -8,6 +8,7 @@ import { Section } from '../../components/Section';
 import { InputSelect } from '../../components/InputSelect';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
 export function Users() {
     const { user, updateProfile } = useAuth();
@@ -16,6 +17,9 @@ export function Users() {
     const [domains, setDomains] = useState([]);
     const [selectedUser, setSelectedUser] = useState(null);
     const [selectedDomain, setSelectedDomain] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [loadingDelete, setLoadingDelete] = useState(false);
+    const [animationLoading, setAnimationLoading] = useState(false);
     const [modeEdit, setModeEdit] = useState(user.role === "admin" ? false : true);
 
     const [name, setName] = useState("");
@@ -50,58 +54,64 @@ export function Users() {
 
     const fetchGetUsersAndDomains = useCallback(async () => {
         if(user.role === "admin") {
+            setAnimationLoading(true);
             const responseUsers = await api.get("/users");
             const responseDomains = await api.get("/domains");
             setUsers(responseUsers.data);
             setDomains(responseDomains.data);
+            setAnimationLoading(false);
         }
     }, []);
 
     const handleSendForm = useCallback(async () => {
-        if (!modeEdit) {
-            api.post("/users", { 
-                name, 
-                email, 
-                password: newPassword,
-                domain_id: selectedDomain?.id 
-            })
-            .then(() => {
+        setLoading(true);
+        try {
+            if (!modeEdit) {
+                await api.post("/users", { 
+                    name, 
+                    email, 
+                    password: newPassword,
+                    domain_id: selectedDomain?.id 
+                });
                 alert("Usuário cadastrado com sucesso!");
                 fetchGetUsersAndDomains();
                 clearFields();
-            })
-            .catch(error => {
-                if (error.response) {
-                    alert(error.response.data.message);
-                } else {
-                    alert("Não foi possível cadastrar o usuário");
+            } else {
+                const updated = {
+                    name,
+                    email,
+                    password: newPassword,
+                    old_password: oldPassword,
+                    domain_id: selectedDomain?.id,
+                    modify_user_id: selectedUser?.id
+                };
+                let sessionUpdated;
+    
+                if (user.id === selectedUser?.id || user.role !== "admin") {
+                    const dataUpdated = {
+                        name: name !== '' ? name : user.name,
+                        email: email !== '' ? email : user.email,
+                    };
+                    sessionUpdated = { ...user, ...dataUpdated };
                 }
-            });
-        } else {
-            const updated = {
-                name,
-                email,
-                password: newPassword,
-                old_password: oldPassword,
-                domain_id: selectedDomain?.id,
-                modify_user_id: selectedUser?.id
+    
+                await updateProfile({ user: updated, sessionUpdated });
+                fetchGetUsersAndDomains();
             }
-            let sessionUpdated;
-
-            if(user.id === selectedUser?.id || user.role !== "admin") {
-                const dataUpdated = {
-                    name: name !== '' ? name : user.name,
-                    email: email !== '' ? email : user.email,
-                }
-                sessionUpdated = { ...user, ...dataUpdated };
+        } catch (error) {
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("Não foi possível realizar a operação");
             }
-
-            await updateProfile({ user: updated, sessionUpdated });
-            fetchGetUsersAndDomains();
+        } finally {
+            setLoading(false);
         }
     }, [name, email, newPassword, oldPassword, selectedDomain, modeEdit, selectedUser, user, updateProfile, fetchGetUsersAndDomains, clearFields]);
-
+    
     const handleDeleteUser = useCallback(async () => {
+        setLoadingDelete(true);
+
         try {
             const confirm = window.confirm("Deseja realmente deletar o perfil?");
 
@@ -117,6 +127,8 @@ export function Users() {
             } else {
                 alert("Não foi possível deletar o perfil.");
             }
+        } finally {
+            setLoadingDelete(false);
         }
     }, [selectedUser, fetchGetUsersAndDomains, clearFields]);
 
@@ -139,113 +151,123 @@ export function Users() {
 
     return (
         <Fixed title="Usuários" route="/users">
-            <Container>
-                {
-                    user.role === "admin" &&
-                    <Section title="Usuários Registrados">
+            {
+                animationLoading ?
+
+                <LoadingSpinner loading={animationLoading} className="usersLoading" />
+
+                :
+
+                <Container>
+                    {
+                        user.role === "admin" &&
+                        <Section title="Usuários Registrados">
+                            <W50>
+                                <InputWrapper>
+                                    <label>E-mail</label>
+
+                                    <InputSelect 
+                                        title="Selecione o e-mail atual do usuário"
+                                        group="email"
+                                        options={users}
+                                        objectValue="email"
+                                        onSelect={handleSelectUser}
+                                        selected={selectedUser}
+                                    />
+                                </InputWrapper>
+                                <InputWrapper className="buttons">
+                                    <Button 
+                                        title="Excluir" 
+                                        background="admin" 
+                                        onClick={handleDeleteUser}
+                                        loading={loadingDelete}
+                                    />
+                                    <Button 
+                                        title={modeEdit ? "Limpar" : "Editar"}
+                                        onClick={handleModeUpdate}
+                                    />
+                                </InputWrapper>
+                            </W50>
+                        </Section>
+                    }
+
+                    <Section title={modeEdit ? "Editar Perfil" : "Criar Perfil"}>
                         <W50>
+                            <InputWrapper>
+                                <label>Nome</label>
+
+                                <Input 
+                                    placeholder="Digite o nome"
+                                    background="admin"
+                                    value={name}
+                                    onChange={e => setName(e.target.value)}
+                                />
+                            </InputWrapper>
+                            
                             <InputWrapper>
                                 <label>E-mail</label>
 
-                                <InputSelect 
-                                    title="Selecione o e-mail atual do usuário"
-                                    group="email"
-                                    options={users}
-                                    objectValue="email"
-                                    onSelect={handleSelectUser}
-                                    selected={selectedUser}
-                                />
-                            </InputWrapper>
-                            <InputWrapper className="buttons">
-                                <Button 
-                                    title="Excluir" 
-                                    background="admin" 
-                                    onClick={handleDeleteUser}
-                                />
-                                <Button 
-                                    title={modeEdit ? "Limpar" : "Editar"}
-                                    onClick={handleModeUpdate}
+                                <Input
+                                    type="email"
+                                    placeholder="Digite o e-mail"
+                                    background="admin"
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)}
                                 />
                             </InputWrapper>
                         </W50>
-                    </Section>
-                }
-
-                <Section title={modeEdit ? "Editar Perfil" : "Criar Perfil"}>
-                    <W50>
-                        <InputWrapper>
-                            <label>Nome</label>
-
-                            <Input 
-                                placeholder="Digite o nome"
-                                background="admin"
-                                value={name}
-                                onChange={e => setName(e.target.value)}
-                            />
-                        </InputWrapper>
                         
-                        <InputWrapper>
-                            <label>E-mail</label>
+                        <W50>
+                            {
+                                modeEdit &&                        
+                                <InputWrapper>
+                                    <label>Senha Antiga</label>
 
-                            <Input
-                                type="email"
-                                placeholder="Digite o e-mail"
-                                background="admin"
-                                value={email}
-                                onChange={e => setEmail(e.target.value)}
-                            />
-                        </InputWrapper>
-                    </W50>
-                    
-                    <W50>
-                        {
-                            modeEdit &&                        
+                                    <Input
+                                        type="password"
+                                        placeholder="Digite a senha antiga"
+                                        background="admin"
+                                        value={oldPassword}
+                                        onChange={e => setOldPassword(e.target.value)}
+                                    />
+                                </InputWrapper>
+                            }
+
                             <InputWrapper>
-                                <label>Senha Antiga</label>
+                                <label>{modeEdit ? "Nova Senha" : "Senha"}</label>
 
-                                <Input
+                                <Input 
                                     type="password"
-                                    placeholder="Digite a senha antiga"
+                                    placeholder={modeEdit ? "Digite a nova senha" : "Digite a senha"}
                                     background="admin"
-                                    value={oldPassword}
-                                    onChange={e => setOldPassword(e.target.value)}
+                                    value={newPassword}
+                                    onChange={e => setNewPassword(e.target.value)}
                                 />
                             </InputWrapper>
-                        }
+                        </W50>
+                        
+                        <W50>
+                            {
+                                user.role === "admin" && (!modeEdit || (modeEdit && selectedUser?.domain_id !== null)) &&
+                                <InputWrapper>
+                                    <label>Domínio Vinculado</label>
 
-                        <InputWrapper>
-                            <label>{modeEdit ? "Nova Senha" : "Senha"}</label>
-
-                            <Input 
-                                type="password"
-                                placeholder={modeEdit ? "Digite a nova senha" : "Digite a senha"}
-                                background="admin"
-                                value={newPassword}
-                                onChange={e => setNewPassword(e.target.value)}
-                            />
-                        </InputWrapper>
-                    </W50>
-                    
-                    <W50>
-                        {
-                            user.role === "admin" && (!modeEdit || (modeEdit && selectedUser?.domain_id !== null)) &&
-                            <InputWrapper>
-                                <label>Domínio Vinculado</label>
-
-                                <InputSelect 
-                                    title="Selecione o domínio para vincular"
-                                    group="domain"
-                                    options={domains}
-                                    objectValue="domain_name"
-                                    onSelect={handleSelectDomain}
-                                    selected={selectedDomain}
-                                />
-                            </InputWrapper>
-                        }
-                    </W50>
-                    <Button title="Salvar" onClick={handleSendForm} />
-                </Section>
-            </Container>
+                                    <InputSelect 
+                                        title="Selecione o domínio para vincular"
+                                        group="domain"
+                                        options={domains}
+                                        objectValue="domain_name"
+                                        onSelect={handleSelectDomain}
+                                        selected={selectedDomain}
+                                    />
+                                </InputWrapper>
+                            }
+                        </W50>
+                        <Button title="Salvar" onClick={handleSendForm} loading={loading} />
+                    </Section>
+                </Container>
+            }
+            
         </Fixed>
     );
 }

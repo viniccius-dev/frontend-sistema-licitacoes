@@ -6,6 +6,10 @@ export const Container = styled.div`
     padding: 0 1.5rem;
     margin-bottom: .2rem;
     overflow-y: auto;
+
+    .homeLoading {
+        height: 65%;
+    }
 `;
 
 export const Bids = styled.div`

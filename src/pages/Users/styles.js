@@ -5,6 +5,10 @@ export const Container = styled.div`
     padding: 0 1.5rem;
     overflow-y: auto;
     grid-area: content;
+
+    .usersLoading {
+        height: 80%;
+    }
 `;
 
 export const W50 = styled.div`

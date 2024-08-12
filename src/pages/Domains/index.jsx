@@ -8,6 +8,7 @@ import { InputSelect } from "../../components/InputSelect";
 import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { Fixed } from "../../components/Fixed";
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
 export function Domains() {
     const { user } = useAuth();
@@ -15,6 +16,11 @@ export function Domains() {
     const [domains, setDomains] = useState([]);
     const [selectedDomain, setSelectedDomain] = useState(null);
     const [modeEdit, setModeEdit] = useState(false);
+
+    const [animationLoading, setAnimationLoading] = useState(false);
+    const [exportDBLoading, setExportDBLoading] = useState(false);
+    const [deleteDBLoading, setDeleteDBLoading] = useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
 
     const [nameDomain, setNameDomain] = useState("");
     const [url, setUrl] = useState("");
@@ -28,8 +34,10 @@ export function Domains() {
 
     const fetchGetDomains = useCallback(async () => {
         if(user.role === "admin") {
+            setAnimationLoading(true);
             const responseDomains = await api.get("/domains");
             setDomains(responseDomains.data);
+            setAnimationLoading(false);
         }
     }, [user.role]);
 
@@ -50,39 +58,31 @@ export function Domains() {
     }, []);
 
     const handleSendForm = useCallback(async () => {
-        if (!modeEdit) {
-            api.post("/domains", {
-                domain_name: nameDomain,
-                url
-            })
-            .then(() => {
+        setSaveLoading(true);
+        try {
+            if (!modeEdit) {
+                await api.post("/domains", {
+                    domain_name: nameDomain,
+                    url
+                });
                 alert("Domínio cadastrado com sucesso!");
-                fetchGetDomains();
-                clearFields();
-            })
-            .catch(error => {
-                if (error.response) {
-                    alert(error.response.data.message);
-                } else {
-                    alert("Não foi possível cadastrar o domínio");
-                }
-            });
-        } else {
-            api.put(`/domains/${selectedDomain.id}`, {
-                domain_name: nameDomain,
-                url,
-            })
-            .then(() => {
+            } else {
+                await api.put(`/domains/${selectedDomain.id}`, {
+                    domain_name: nameDomain,
+                    url,
+                });
                 alert("Domínio atualizado com sucesso!");
-                fetchGetDomains();
-            })
-            .catch(error => {
-                if (error.response) {
-                    alert(error.response.data.message);
-                } else {
-                    alert("Não foi possível atualizar o domínio");
-                }
-            });
+            }
+            fetchGetDomains();
+            clearFields();
+        } catch (error) {
+            if (error.response) {
+                alert(error.response.data.message);
+            } else {
+                alert("Não foi possível realizar a operação");
+            }
+        } finally {
+            setSaveLoading(false);
         }
     }, [nameDomain, url, selectedDomain, modeEdit, user, fetchGetDomains, clearFields]);
 
@@ -94,6 +94,7 @@ export function Domains() {
         }
 
         try {
+            setExportDBLoading(true);
             const response = await api.get(`domains/export/${selectedDomain.id}`, {
                 responseType: 'blob',
             });
@@ -108,6 +109,8 @@ export function Domains() {
         } catch (error) {
             console.error("Erro ao exportar o banco de dados", error);
             alert("Erro ao exportar o banco de dados. Tente novamente.");
+        } finally {
+            setExportDBLoading(false);
         }
     }, [selectedDomain]);
 
@@ -116,6 +119,7 @@ export function Domains() {
             const confirm = window.confirm("Tem certeza que deseja deletar o domínio? Todos os usuários, licitações e anexos vinculados a ele também serão excluídos permanentemente. É recomendado a exportação do banco de dados como cópia backup antes de realizar a exclusão.");
 
             if(confirm) {
+                setDeleteDBLoading(true);
                 await api.delete(`/domains/${selectedDomain?.id}`);
                 alert("Domínio deletado com sucesso.");
                 fetchGetDomains();
@@ -127,6 +131,8 @@ export function Domains() {
             } else {
                 alert("Não foi possível deletar o domínio.");
             }
+        } finally {
+            setDeleteDBLoading(false);
         }
     }, [selectedDomain, fetchGetDomains, clearFields]);
 
@@ -138,65 +144,77 @@ export function Domains() {
 
     return (
         <Fixed title="Domínios" route="/domains">
-            <Container>
-                <Section title="Domínios Registrados">
-                    <W50>
-                        <InputWrapper>
-                            <label>URL do domínio</label>
+            {
+                animationLoading ?
 
-                            <InputSelect 
-                                title="Selecione o URL do domínio"
-                                group="domain"
-                                options={domains}
-                                objectValue="url"
-                                onSelect={handleSelectDomain}
-                                selected={selectedDomain}
-                            />
-                        </InputWrapper>
-                        <Button 
-                            className="button" 
-                            title="Exportar Banco de Dados" 
-                            onClick={handleExportDatabase}
-                        />
-                    </W50>
-                    <W50>
-                        <Button 
-                            background="admin" 
-                            title="Excluir" 
-                            onClick={handleDeleteDomain}
-                        />
-                        <Button 
-                            title={modeEdit ? "Limpar" : "Editar"}
-                            onClick={handleModeUpdate}
-                        />
-                    </W50>
-                </Section>
-                <Section title={modeEdit ? "Editar Domínio" : "Criar Domínio"}>
-                    <W50>
-                        <InputWrapper>
-                            <label>Nome</label>
+                    <LoadingSpinner loading={animationLoading} />
+                
+                :
 
-                            <Input 
-                                placeholder="Digite o nome do domínio"
-                                background="admin"
-                                value={nameDomain}
-                                onChange={e => setNameDomain(e.target.value)}
-                            />
-                        </InputWrapper>
-                        <InputWrapper>
-                            <label>URL do domínio</label>
+                    
+                    <Container>
+                        <Section title="Domínios Registrados">
+                            <W50>
+                                <InputWrapper>
+                                    <label>URL do domínio</label>
 
-                            <Input 
-                                placeholder="Digite o URL do domínio"
-                                background="admin"
-                                value={url}
-                                onChange={e => setUrl(e.target.value)}
-                            />
-                        </InputWrapper>
-                    </W50>
-                    <Button title="Salvar" onClick={handleSendForm} />
-                </Section>
-            </Container>
+                                    <InputSelect 
+                                        title="Selecione o URL do domínio"
+                                        group="domain"
+                                        options={domains}
+                                        objectValue="url"
+                                        onSelect={handleSelectDomain}
+                                        selected={selectedDomain}
+                                    />
+                                </InputWrapper>
+                                <Button 
+                                    className="button" 
+                                    title="Exportar Banco de Dados" 
+                                    onClick={handleExportDatabase}
+                                    loading={exportDBLoading}
+                                />
+                            </W50>
+                            <W50>
+                                <Button 
+                                    background="admin" 
+                                    title="Excluir" 
+                                    onClick={handleDeleteDomain}
+                                    loading={deleteDBLoading}
+                                />
+                                <Button 
+                                    title={modeEdit ? "Limpar" : "Editar"}
+                                    onClick={handleModeUpdate}
+                                />
+                            </W50>
+                        </Section>
+                        <Section title={modeEdit ? "Editar Domínio" : "Criar Domínio"}>
+                            <W50>
+                                <InputWrapper>
+                                    <label>Nome</label>
+
+                                    <Input 
+                                        placeholder="Digite o nome do domínio"
+                                        background="admin"
+                                        value={nameDomain}
+                                        onChange={e => setNameDomain(e.target.value)}
+                                    />
+                                </InputWrapper>
+                                <InputWrapper>
+                                    <label>URL do domínio</label>
+
+                                    <Input 
+                                        placeholder="Digite o URL do domínio"
+                                        background="admin"
+                                        value={url}
+                                        onChange={e => setUrl(e.target.value)}
+                                    />
+                                </InputWrapper>
+                            </W50>
+                            <Button title="Salvar" onClick={handleSendForm} loading={saveLoading} />
+                        </Section>
+                    </Container>
+
+            }
         </Fixed>
     );
 }

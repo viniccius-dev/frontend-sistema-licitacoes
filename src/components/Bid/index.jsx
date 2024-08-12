@@ -10,8 +10,9 @@ export function Bid({ data, ...rest }) {
     const [color, setColor] = useState("");
 
     const formatDate = (dateString) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('pt-BR');
+        const [fullDate, fullTime] = dateString.split(' ');
+        const [year, month, day] = fullDate.split('-');
+        return `${day}/${month}/${year}`;
     }
 
     useEffect(() => {

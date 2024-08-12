@@ -2,20 +2,22 @@ import { FaClock } from 'react-icons/fa';
 import { TfiDropboxAlt } from "react-icons/tfi";
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
 
 import { Container, NotFound } from './styles';
 import { Section } from '../../components/Section';
 import { Button } from '../../components/Button';
 import { Fixed } from '../../components/Fixed';
 import { File } from '../../components/File';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
 import { api } from '../../services/api';
 
 export function Details() {
     const [bid, setBid] = useState(null);
     const [attachments, setAttachments] = useState([]);
+
+    const [animationLoading, setAnimationLoading] = useState(false);
+    const [deleteLoading, setDeletenLoading] = useState(false);
 
     const params = useParams();
     const navigate = useNavigate();
@@ -26,9 +28,11 @@ export function Details() {
 
     async function handleDeleteBid() {
         try {
+            
             const confirm = window.confirm("Tem certeza que deseja deletar essa licitação e os documentos anexados a ela? Esta ação não poderá ser desfeita.");
-
+            
             if(confirm) {
+                setDeletenLoading(true);
                 const files = { attachments: attachments.map(attachment => attachment.id) };
 
                 await api.delete(`/bids/${params.id}`, { data: files });
@@ -41,6 +45,8 @@ export function Details() {
             } else {
                 alert("Não foi possível deletar a licitação.");
             }
+        } finally {
+            setDeletenLoading(false);
         }
     }
 
@@ -49,7 +55,9 @@ export function Details() {
     }
 
     function formatDateTime(dateTime) {
-        return format(new Date(dateTime), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR });
+        const [fullDate, fullTime] = dateTime.split(' ');
+        const [year, month, day] = fullDate.split('-');
+        return `${day}/${month}/${year} às ${fullTime}`;
     }
 
     function getFileExtension(filename) {
@@ -57,11 +65,13 @@ export function Details() {
     }
 
     useEffect(() => {
+        setAnimationLoading(true);
         async function fetchBid() {
             const responseBid = await api.get(`/bids/${params.id}`);
             const responseAttachments = await api.get(`/bids/attachments/${params.id}`);
             setBid(responseBid.data);
             setAttachments(responseAttachments.data);
+            setAnimationLoading(false);
         }
 
         fetchBid();
@@ -70,48 +80,55 @@ export function Details() {
     return (
         <Fixed title="Licitação" route="/details">
             {
-                bid ?
-                <Container>
-                    <header>
-                        <h2>Chamada Pública N° {bid.modality_process_number}</h2>
-                        <strong>Processo Licitatório N° {bid.bidding_process_number} - {bid.status}</strong>
-                        <small><FaClock /> Data e hora de realização: {formatDateTime(bid.realized_at)}</small>
-                    </header>
-                    
-                    <Section title="Objeto">
-                        <p>{bid.object}</p>
-                    </Section>
+                animationLoading ?
 
-                    {
-                        bid.observations &&
-                        <Section title="Observações">
-                            <p>{bid.observations}</p>
-                        </Section>
-                    }
+                    <LoadingSpinner loading={animationLoading} />
 
-                    <Section title="Anexos">
-                        {
-                            attachments &&
-                            attachments.map((file, index) => (
-                                <File 
-                                    key={index} 
-                                    title={file.name} 
-                                    extension={getFileExtension(file.attachment)} 
-                                    onClick={() => handleLinkClick(file.attachment)}
-                                />
-                            ))
-                        }
-                    </Section>
-
-                    <footer>        
-                        <Button title="Editar" onClick={handleLinkEdit} />
-                        <Button background="admin" title="Excluir" onClick={handleDeleteBid} />
-                    </footer>
-                </Container>
                 :
-                <NotFound>
-                    <h2><TfiDropboxAlt /> Licitação Não Encontrada</h2>
-                </NotFound>
+
+                    bid ?
+                    
+                    <Container>
+                        <header>
+                            <h2>Chamada Pública N° {bid.modality_process_number}</h2>
+                            <strong>Processo Licitatório N° {bid.bidding_process_number} - {bid.status}</strong>
+                            <small><FaClock /> Data e hora de realização: {formatDateTime(bid.realized_at)}</small>
+                        </header>
+                        
+                        <Section title="Objeto">
+                            <p>{bid.object}</p>
+                        </Section>
+
+                        {
+                            bid.observations &&
+                            <Section title="Observações">
+                                <p>{bid.observations}</p>
+                            </Section>
+                        }
+
+                        <Section title="Anexos">
+                            {
+                                attachments &&
+                                attachments.map((file, index) => (
+                                    <File 
+                                        key={index} 
+                                        title={file.name} 
+                                        extension={getFileExtension(file.attachment)} 
+                                        onClick={() => handleLinkClick(file.attachment)}
+                                    />
+                                ))
+                            }
+                        </Section>
+
+                        <footer>        
+                            <Button title="Editar" onClick={handleLinkEdit} />
+                            <Button background="admin" title="Excluir" onClick={handleDeleteBid} loading={deleteLoading} />
+                        </footer>
+                    </Container>
+                    :
+                    <NotFound>
+                        <h2><TfiDropboxAlt /> Licitação Não Encontrada</h2>
+                    </NotFound>
             }
         </Fixed>
     );

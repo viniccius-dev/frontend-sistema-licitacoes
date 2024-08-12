@@ -11,11 +11,14 @@ import { Container, Form, Background } from './styles';
 export function SignIn() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const { signIn } = useAuth();
 
-    function handleSignIn() {
-        signIn({ email, password });
+    async function handleSignIn() {
+        setLoading(true);
+        await signIn({ email, password });
+        setLoading(false);
     }
 
     return (
@@ -39,7 +42,7 @@ export function SignIn() {
                     onChange={e => setPassword(e.target.value)}
                 />
                 
-                <Button title="Entrar" onClick={handleSignIn} />
+                <Button title="Entrar" onClick={handleSignIn} loading={loading} />
             </Form>
         </Container>
         

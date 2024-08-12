@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Container, W50, InputWrapper } from './styles';
 
@@ -15,6 +16,9 @@ import { Fixed } from '../../components/Fixed';
 
 export function NewBidding() {
     const { user } = useAuth();
+    const navigate = useNavigate();
+
+    const [saveLoading, setSaveLoading] = useState(false);
 
     const [domains, setDomains] = useState([]);
     const [selectedModality, setSelectedModality] = useState(null);
@@ -69,6 +73,8 @@ export function NewBidding() {
             domain_id: selectedDomain?.id
         };
 
+        setSaveLoading(true);
+
         try {
             const biddingResponse = await api.post("/bids", biddingData);
 
@@ -86,12 +92,15 @@ export function NewBidding() {
             }
 
             alert("Licitação cadastrada com sucesso!");
+            navigate("/");
         } catch (error) {
             if (error.response) {
                 alert(error.response.data.message);
             } else {
                 alert("Erro ao cadastrar a licitação.");
             }
+        } finally {
+            setSaveLoading(false);
         }
 
     };
@@ -229,7 +238,8 @@ export function NewBidding() {
                     <InputWrapper>
                         <Button 
                             title="Cadastrar" 
-                            onClick={handleSubmit}    
+                            onClick={handleSubmit}
+                            loading={saveLoading}
                         />
                     </InputWrapper>
                 </W50>

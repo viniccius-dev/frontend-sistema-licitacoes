@@ -7,12 +7,14 @@ import { api } from '../../services/api';
 import { Fixed } from '../../components/Fixed';
 import { Search } from '../../components/Search';
 import { Bid } from '../../components/Bid';
+import { LoadingSpinner } from '../../components/LoadingSpinner';
 
 export function Home() {
     const [data, setData] = useState([]);
     const [bids, setBids] = useState([]);
     const [filter, setFilter] = useState("Tudo");
     const [search, setSearch] = useState("");
+    const [loading, setLoading] = useState(false);
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -23,6 +25,7 @@ export function Home() {
 
     useEffect(() => {
         async function fetchBids() {
+            setLoading(true);
             const params = new URLSearchParams(location.search);
             const modalities = params.get('modalities');
             const years = params.get('years');
@@ -46,6 +49,8 @@ export function Home() {
                     console.log(error);
                     alert("Não foi acessar os dados das licitações");
                 }
+            } finally {
+                setLoading(false);
             }
         }
         
@@ -67,21 +72,33 @@ export function Home() {
 
     return (
         <Fixed title="Licitações" route="/">
+
             <Container>
                 <Search setFilter={setFilter} setSearch={setSearch} data={data} filter={filter}/>
 
-                <Bids>
-                    {
-                        bids.map((bid) => (
-                            <Bid 
-                                key={bid.bid_id}
-                                data={bid}
-                                onClick={() => handleLinkClick(bid.bid_id)} 
-                            />
-                        ))
-                    }
-                </Bids>
+                {
+                    loading ?
+
+                    <LoadingSpinner loading={loading} className="homeLoading" />
+
+                    :
+
+                    <Bids>
+                        {
+                            bids.map((bid) => (
+                                <Bid 
+                                    key={bid.bid_id}
+                                    data={bid}
+                                    onClick={() => handleLinkClick(bid.bid_id)} 
+                                />
+                            ))
+                        }
+                    </Bids>
+
+                }
+
             </Container>
+
         </Fixed>
     );
 }
