@@ -90,7 +90,7 @@ export function Details() {
                     
                     <Container>
                         <header>
-                            <h2>Chamada Pública N° {bid.modality_process_number}</h2>
+                            <h2>{bid.bidding_modality} { bid.modality_process_number.split("/")[0] > 0 && `N° ${bid.modality_process_number}` }</h2>
                             <strong>Processo Licitatório N° {bid.bidding_process_number} - {bid.status}</strong>
                             <small><FaClock /> Data e hora de realização: {formatDateTime(bid.realized_at)}</small>
                         </header>

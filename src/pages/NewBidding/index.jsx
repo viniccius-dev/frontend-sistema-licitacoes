@@ -136,14 +136,14 @@ export function NewBidding() {
                         />
                     </InputWrapper>
                     <InputWrapper>
-                        <label>N° do processo da modalidade</label>
+                        <label>N° do processo licitatório</label>
 
                         <Input 
-                            placeholder="Digite o n° do processo da modalidade" 
+                            placeholder="Digite o n° do processo licitatório" 
                             background="admin"
                             maskType="identification"
-                            value={numModalityProcess}
-                            onChange={(e) => setNumModalityProcess(e.target.value)}
+                            value={numBidProcess}
+                            onChange={(e) => setNumBidProcess(e.target.value)}
                         />
                     </InputWrapper>
                 </W50>
@@ -161,14 +161,14 @@ export function NewBidding() {
                         />
                     </InputWrapper>
                     <InputWrapper>
-                        <label>N° do processo licitatório</label>
+                        <label>N° do processo administrativo</label>
 
                         <Input 
-                            placeholder="Digite o n° do processo licitatório" 
+                            placeholder="Digite o n° do processo da modalidade" 
                             background="admin"
                             maskType="identification"
-                            value={numBidProcess}
-                            onChange={(e) => setNumBidProcess(e.target.value)}
+                            value={numModalityProcess}
+                            onChange={(e) => setNumModalityProcess(e.target.value)}
                         />
                     </InputWrapper>
                 </W50>

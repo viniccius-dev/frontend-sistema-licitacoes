@@ -163,6 +163,7 @@ export const Footer = styled.footer`
         display: flex;
         flex: 1;
         flex-direction: column;
+        
     }
 
     > div strong {
@@ -171,5 +172,7 @@ export const Footer = styled.footer`
 
     > div small {
         font-size: 0.75rem;
+        word-break: break-word;
+        min-width: 11.1rem;
     }
 `;
