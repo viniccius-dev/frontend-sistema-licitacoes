@@ -29,8 +29,11 @@ export function Bid({ data, ...rest }) {
     return (
         <Container type="button" {...rest}>
             <Details>
-                <small>Processo Licitatório N° {data.bidding_process_number}</small>
-                <span>{data.bidding_modality} { data.modality_process_number.split("/")[0] > 0 && `N° ${data.modality_process_number}` } </span>
+                {
+                    data.bidding_process_number.split("/")[0] > 0 && 
+                    <small>Processo Administrativo N° {data.bidding_process_number}</small>
+                }
+                <span>{data.bidding_modality} N° {data.modality_process_number}</span>
             </Details>
             <Status>
                 <div style={{color: color}}>

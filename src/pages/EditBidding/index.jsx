@@ -199,8 +199,8 @@ export function EditBidding() {
                                         placeholder="Digite o n° do processo licitatório" 
                                         background="admin"
                                         maskType="identification"
-                                        value={numBidProcess}
-                                        onChange={(e) => setNumBidProcess(e.target.value)}
+                                        value={numModalityProcess}
+                                        onChange={(e) => setNumModalityProcess(e.target.value)}
                                         disabled
                                     />
                                 </InputWrapper>
@@ -225,8 +225,8 @@ export function EditBidding() {
                                         placeholder="Digite o n° do processo da modalidade" 
                                         background="admin"
                                         maskType="identification"
-                                        value={numModalityProcess}
-                                        onChange={(e) => setNumModalityProcess(e.target.value)}
+                                        value={numBidProcess}
+                                        onChange={(e) => setNumBidProcess(e.target.value)}
                                     />
                                 </InputWrapper>
                             </W50>

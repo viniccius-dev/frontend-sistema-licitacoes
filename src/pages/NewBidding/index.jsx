@@ -63,10 +63,10 @@ export function NewBidding() {
         const formattedDateTime = formatDateTime(date, hour);
 
         const biddingData = {
-            bidding_modality: selectedModality.name,
+            bidding_modality: selectedModality?.name,
             bidding_process_number: numBidProcess,
             modality_process_number: numModalityProcess,
-            status: selectedStatus.name,
+            status: selectedStatus?.name,
             object,
             observations,
             realized_at: formattedDateTime,
@@ -142,8 +142,8 @@ export function NewBidding() {
                             placeholder="Digite o n° do processo licitatório" 
                             background="admin"
                             maskType="identification"
-                            value={numBidProcess}
-                            onChange={(e) => setNumBidProcess(e.target.value)}
+                            value={numModalityProcess}
+                            onChange={(e) => setNumModalityProcess(e.target.value)}
                         />
                     </InputWrapper>
                 </W50>
@@ -167,8 +167,8 @@ export function NewBidding() {
                             placeholder="Digite o n° do processo da modalidade" 
                             background="admin"
                             maskType="identification"
-                            value={numModalityProcess}
-                            onChange={(e) => setNumModalityProcess(e.target.value)}
+                            value={numBidProcess}
+                            onChange={(e) => setNumBidProcess(e.target.value)}
                         />
                     </InputWrapper>
                 </W50>
