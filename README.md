@@ -5,6 +5,8 @@ Este é o front-end do Sistema de Licitações, desenvolvido em React, que permi
 ## Demonstração
 Você pode acessar o deploy deste projeto no Netlify:  
 [Deploy do Front-end](https://chipper-taiyaki-f862b9.netlify.app)
+- *E-mail*: usuario@teste.com
+- *Senha*: 123
 
 **Importante**: Se rodar localmente, o projeto só conseguirá consumir a API a partir de `localhost:5173`, devido a restrições de CORS.
 
